@@ -1,4 +1,5 @@
 {
+    "type": "module",
     "name": "os_project_docker",
     "dependencies": {
         "express" : "^4.18.2",
