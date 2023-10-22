@@ -1,11 +1,36 @@
 //import { mongoose } from "./app";
 import mongoose from "mongoose"
 
-export const create_account_Schema = new mongoose.Schema({
+export const account_Schema = new mongoose.Schema({
     id : Number,
     username : String,
     balance : Number,
-    time : Date
+    createAt : {type: Date, default: Date.now()},
+    updateAt : {type: Date, default: Date.now()}
 });
+export const account = mongoose.model("Account", account_Schema);
 
-export const create_account = mongoose.model("createAccount", create_account_Schema);
+export const money_transfer_Schema = new mongoose.Schema({
+    type : {type: String, default: "transfer"},
+    receiverid : Number,
+    senderid : Number,
+    balance : Number,
+    createAt : {type: Date, default: Date.now()}
+});
+export const money_transfer = mongoose.model("moneyTransfer", money_transfer_Schema, 'moneyTransfer');
+
+export const deposit_Schema = new mongoose.Schema({
+    type : {type: String, default: "deposit"},
+    userid : Number,
+    balance : Number,
+    createAt : {type: Date, default: Date.now()}
+});
+export const deposit = mongoose.model("deposit", deposit_Schema, 'moneyTransfer');
+
+export const withdraw_Schema = new mongoose.Schema({
+    type : {type: String, default: "withdraw"},
+    userid : Number,
+    balance : Number,
+    createAt : {type: Date, default: Date.now()}
+});
+export const withdraw = mongoose.model("withdraw", withdraw_Schema, 'moneyTransfer');
