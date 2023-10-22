@@ -1,6 +1,6 @@
 import { account, deposit, money_transfer, withdraw } from "./model.js"
 import { autoIncrement, getBalance } from "./common.js"
-import { BadRequest, Create } from "./constant.js"
+import { BadRequest, Create, OK, ServerError } from "./constant.js"
 
 import express from "express"
 import bodyParser from "body-parser"
@@ -25,14 +25,6 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
-//test
-app.get('/all-money-transfer', (req, res) => {
-  money_transfer.find({}, (err, accounts) => {
-    if (err) res.status(ServerError)
-    else res.json(accounts)
-  })
-});
-
 //finish
 app.get('/os-project/get-account', (req, res) => {
   account.find({}, (err, accounts) => {
@@ -44,6 +36,7 @@ app.get('/os-project/get-account', (req, res) => {
 //finish
 app.post('/os-project/create-account', (req, res) => {
   const { username, balance } = req.body;
+  if(balance != 'Number') res.sendStatus(BadRequest);
   var id;
   autoIncrement().then((count) => {
     id = count;
@@ -65,30 +58,33 @@ app.post('/os-project/create-account', (req, res) => {
 })
 //finish
 app.post('/os-project/transfer', (req, res) => {
-  const { receiverid, senderid, balance } = req.body;
-
-  var transfer = new money_transfer({
-    receiverid,
-    senderid,
-    balance
-  })
+  const { receiverid, senderid, amount } = req.body;
+  if(amount != 'Number') res.sendStatus(BadRequest);
 
   getBalance(senderid).then((senderAccountBlance, err) => {
     if (err) res.sendStatus(ServerError)
     else if (senderAccountBlance == null) res.sendStatus(BadRequest)
-    else if (senderAccountBlance < balance) res.sendStatus(BadRequest)
+    else if (senderAccountBlance < amount) res.sendStatus(BadRequest)
     else {
       getBalance(receiverid).then((receiverAccountBalance, err) => {
+        var transfer = new money_transfer({
+          receiverid,
+          senderid,
+          amount,
+          receiverbalance: receiverAccountBalance + amount,
+          senderbalance: senderAccountBlance - amount
+        })
+
         const updateReceiver = {
           $set: {
-            balance: receiverAccountBalance + balance,
+            balance: receiverAccountBalance + amount,
             updateAt: Date.now()
           }
         }
 
         const updateSender = {
           $set: {
-            balance: senderAccountBlance - balance,
+            balance: senderAccountBlance - amount,
             updateAt: Date.now()
           }
         }
@@ -124,20 +120,23 @@ app.post('/os-project/transfer', (req, res) => {
 })
 //finish
 app.put('/os-project/deposit', (req, res) => {
-  const { userid, balance } = req.body;
-
-  var depositInfo = new deposit({
-    userid,
-    balance
-  })
+  const { userid, amount } = req.body;
+  if(amount != 'Number') res.sendStatus(BadRequest);
 
   getBalance(userid).then((accountBalance, err) => {
     if (err) res.sendStatus(ServerError);
     else if (accountBalance == null) res.sendStatus(BadRequest);
     else {
+
+      var depositInfo = new deposit({
+        userid,
+        amount,
+        balance: accountBalance + amount
+      })
+
       const update = {
         $set: {
-          balance: balance + accountBalance,
+          balance: accountBalance + amount,
           updateAt: Date.now()
         }
       }
@@ -159,21 +158,23 @@ app.put('/os-project/deposit', (req, res) => {
 })
 //finish
 app.put('/os-project/withdraw', (req, res) => {
-  const { userid, balance } = req.body;
-
-  var withdrawInfo = new withdraw({
-    userid,
-    balance: balance
-  })
+  const { userid, amount } = req.body;
+  if(amount != 'Number') res.sendStatus(BadRequest);
 
   getBalance(userid).then((accountBalance, err) => {
     if (err) res.sendStatus(ServerError);
     else if (accountBalance == null) res.sendStatus(BadRequest);
-    else if (accountBalance < balance) res.sendStatus(BadRequest);
+    else if (accountBalance < amount) res.sendStatus(BadRequest);
     else {
+      var withdrawInfo = new withdraw({
+        userid,
+        amount,
+        balance: accountBalance - amount
+      })
+
       const update = {
         $set: {
-          balance: accountBalance - balance,
+          balance: accountBalance - amount,
           updateAt: Date.now()
         }
       }
@@ -194,59 +195,58 @@ app.put('/os-project/withdraw', (req, res) => {
   })
 })
 
-//test
-app.post('/os-project/create-account-manual', (req, res) => {
-  const { id, username, balance } = req.body;
+app.get('/os-project/transaction', async (req, res) => {
+  const { userid } = req.body;
 
-  var create_account = new account({
-    id,
-    username,
-    balance
-  });
+  const documents = db.collection('moneyTransfer').find({})
+  let transactions = [];
 
-  create_account.save()
-    .then(() => {
-      res.sendStatus(Create)
-    })
-    .catch((err) => {
-      res.sendStatus(ServerError)
-    });
-})
+  await documents.forEach(async (doc) => {
+    //if type is deposit and withdraw
+    if(doc.type != "transfer"){
+      if(doc.userid == userid){
+        //create transaction to add to array
+        const newTransaction = {
+          userid,
+          deposit: (doc.type == "deposit") ? doc.amount : null,
+          withdraw: (doc.type == "withdraw") ? doc.amount : null,
+          balance: doc.balance,
+          timestamp: doc.createAt
+        }
+        console.log("this is new")
 
-//test
-app.get('/os-project/view-collection', (req, res) => {
-  mongoose.connection.db.listCollections().toArray((err, collections) => {
-    if (err) {
-      console.error('เกิดข้อผิดพลาดในการดึงรายชื่อคอลเลกชัน:', err);
-    } else {
-      collections.forEach((collection) => {
-        console.log('คอลเลกชัน:', collection.name);
-      });
+        transactions.push(Object.assign({}, newTransaction));
+      }
+    }
+    //if type is transfer
+    else {
+      //if this user is receiver
+      if(doc.receiverid == userid){
+        const newTransaction = {
+          userid,
+          deposit: doc.amount,
+          withdraw: null,
+          balance: doc.receiverbalance,
+          timestamp: doc.createAt
+        }
+
+        transactions.push(Object.assign({}, newTransaction));
+      }
+      //if this user is sender
+      else if(doc.senderid == userid){
+        const newTransaction = {
+          userid,
+          deposit: null,
+          withdraw: doc.amount,
+          balance: doc.senderbalance,
+          timestamp: doc.createAt
+        }
+
+        transactions.push(Object.assign({}, newTransaction));
+      }
     }
   })
-  res.send(OK);
-})
-//test
-app.delete('/os-project/delete-all-account', (req, res) => {
-  account.deleteMany({}, (err) => {
-    if (err) {
-      console.error('Error deleting data:', err);
-    } else {
-      console.log('All data deleted successfully.');
-    }
-  });
-  res.send(OK);
-})
-//test
-app.delete('/os-project/delete-all-moneytransfer', (req, res) => {
-  money_transfer.deleteMany({}, (err) => {
-    if (err) {
-      console.error('Error deleting data:', err);
-    } else {
-      console.log('All data deleted successfully.');
-    }
-  });
-  res.send(OK);
+  res.json(transactions)
 })
 
 app.listen(port, () => {

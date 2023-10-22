@@ -14,14 +14,17 @@ export const money_transfer_Schema = new mongoose.Schema({
     type : {type: String, default: "transfer"},
     receiverid : Number,
     senderid : Number,
-    balance : Number,
+    amount : Number,
+    receiverbalance : Number,
+    senderbalance : Number,
     createAt : {type: Date, default: Date.now()}
 });
-export const money_transfer = mongoose.model("moneyTransfer", money_transfer_Schema, 'moneyTransfer');
+export const money_transfer = mongoose.model("Transfer", money_transfer_Schema, 'moneyTransfer');
 
 export const deposit_Schema = new mongoose.Schema({
     type : {type: String, default: "deposit"},
     userid : Number,
+    amount : Number,
     balance : Number,
     createAt : {type: Date, default: Date.now()}
 });
@@ -30,6 +33,7 @@ export const deposit = mongoose.model("deposit", deposit_Schema, 'moneyTransfer'
 export const withdraw_Schema = new mongoose.Schema({
     type : {type: String, default: "withdraw"},
     userid : Number,
+    amount : Number,
     balance : Number,
     createAt : {type: Date, default: Date.now()}
 });
