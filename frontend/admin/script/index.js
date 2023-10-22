@@ -29,5 +29,5 @@ create_account_but.addEventListener('click', async () => {
 });
 
 get_account_but.addEventListener('click', async () => {
-    window.location.href = 'get-account'
+    window.location.href = 'get-account.html'
 });
