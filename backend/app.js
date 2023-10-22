@@ -28,15 +28,25 @@ db.once('open', () => {
 //finish
 app.get('/os-project/get-account', (req, res) => {
   account.find({}, (err, accounts) => {
-    if (err) res.status(ServerError)
-    else res.json(accounts)
+    if (err) {
+      res.send(err);
+      res.status(ServerError);
+      return;
+    }
+    else {
+      res.json(accounts);
+      return;
+    }
   })
 });
 
 //finish
 app.post('/os-project/create-account', (req, res) => {
   const { username, balance } = req.body;
-  if(balance != 'Number') res.sendStatus(BadRequest);
+  if(typeof(balance) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
   var id;
   autoIncrement().then((count) => {
     id = count;
@@ -47,24 +57,33 @@ app.post('/os-project/create-account', (req, res) => {
       balance,
     });
 
-    newAccount.save()
-      .then(() => {
-        res.sendStatus(Create);
-      })
-      .catch((err) => {
-        res.sendStatus(ServerError);
-      });
+    newAccount.save();
+    res.sendStatus(ServerError);
+    return;
   })
 })
 //finish
 app.post('/os-project/transfer', (req, res) => {
   const { receiverid, senderid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if(typeof(amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
   getBalance(senderid).then((senderAccountBlance, err) => {
-    if (err) res.sendStatus(ServerError)
-    else if (senderAccountBlance == null) res.sendStatus(BadRequest)
-    else if (senderAccountBlance < amount) res.sendStatus(BadRequest)
+    if (err) {
+      res.send(err);
+      res.sendStatus(ServerError);
+      return;
+    }
+    else if (senderAccountBlance == null) {
+      res.sendStatus(BadRequest);
+      return;
+    }
+    else if (senderAccountBlance < amount) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
       getBalance(receiverid).then((receiverAccountBalance, err) => {
         var transfer = new money_transfer({
@@ -93,7 +112,9 @@ app.post('/os-project/transfer', (req, res) => {
 
         account.updateOne(senderQuery, updateSender, (err, result) => {
           if (err) {
-            throw (err)
+            res.send(err);
+            res.sendStatus(BadRequest)
+            return;
           } else {
             console.log('Document updated successfully.');
           }
@@ -101,19 +122,17 @@ app.post('/os-project/transfer', (req, res) => {
 
         account.updateOne(receiverQuery, updateReceiver, (err, result) => {
           if (err) {
-            throw (err)
+            res.send(err);
+            res.sendStatus(BadRequest)
+            return;
           } else {
             console.log('Document updated successfully.');
           }
         })
 
-        transfer.save()
-          .then(() => {
-            res.send(Create);
-          })
-          .catch((err) => {
-            res.status(ServerError);
-          })
+        transfer.save();
+        res.sendStatus(Create);
+        return;
       })
     }
   })
@@ -121,13 +140,22 @@ app.post('/os-project/transfer', (req, res) => {
 //finish
 app.put('/os-project/deposit', (req, res) => {
   const { userid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if(typeof(amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
   getBalance(userid).then((accountBalance, err) => {
-    if (err) res.sendStatus(ServerError);
-    else if (accountBalance == null) res.sendStatus(BadRequest);
+    if (err) {
+      res.send(err);
+      res.sendStatus(ServerError);
+      return;
+    }
+    else if (accountBalance == null) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
-
       var depositInfo = new deposit({
         userid,
         amount,
@@ -145,7 +173,9 @@ app.put('/os-project/deposit', (req, res) => {
 
       account.updateOne(myQuery, update, (err, result) => {
         if (err) {
-          throw (err)
+          res.send(err);
+          res.sendStatus(BadRequest)
+          return;
         } else {
           console.log('Document updated successfully.');
         }
@@ -153,18 +183,32 @@ app.put('/os-project/deposit', (req, res) => {
 
       depositInfo.save();
       res.send(Create);
+      return;
     }
   })
 })
 //finish
 app.put('/os-project/withdraw', (req, res) => {
   const { userid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if(typeof(amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
   getBalance(userid).then((accountBalance, err) => {
-    if (err) res.sendStatus(ServerError);
-    else if (accountBalance == null) res.sendStatus(BadRequest);
-    else if (accountBalance < amount) res.sendStatus(BadRequest);
+    if (err) {
+      res.send(err);
+      res.sendStatus(ServerError);
+      return;
+    }
+    else if (accountBalance == null) {
+      res.sendStatus(BadRequest);
+      return;
+    }
+    else if (accountBalance < amount) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
       var withdrawInfo = new withdraw({
         userid,
@@ -183,7 +227,9 @@ app.put('/os-project/withdraw', (req, res) => {
 
       account.updateOne(myQuery, update, (err, result) => {
         if (err) {
-          throw (err)
+          res.send(err);
+          res.sendStatus(ServerError);
+          return;
         } else {
           console.log('Document updated successfully.');
         }
@@ -191,12 +237,17 @@ app.put('/os-project/withdraw', (req, res) => {
 
       withdrawInfo.save();
       res.send(Create);
+      return;
     }
   })
 })
 
 app.get('/os-project/transaction', async (req, res) => {
   const { userid } = req.body;
+  if(typeof(userid) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
   const documents = db.collection('moneyTransfer').find({})
   let transactions = [];
@@ -213,7 +264,6 @@ app.get('/os-project/transaction', async (req, res) => {
           balance: doc.balance,
           timestamp: doc.createAt
         }
-        console.log("this is new")
 
         transactions.push(Object.assign({}, newTransaction));
       }
@@ -246,7 +296,8 @@ app.get('/os-project/transaction', async (req, res) => {
       }
     }
   })
-  res.json(transactions)
+  res.json(transactions);
+  return;
 })
 
 app.listen(port, () => {
