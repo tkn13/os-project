@@ -1,17 +1,17 @@
-var transfer_btn = document.getElementById("money-transfer");
-var deposit_btn = document.getElementById("deposit");
-var withdrawal_btn = document.getElementById("withdrawal");
-var transaction_btn = document.getElementById("transaction-history");
+var transfer_btn = document.getElementById("money-transfer-btn");
+var deposit_btn = document.getElementById("deposit-btn");
+var withdrawal_btn = document.getElementById("withdrawal-btn");
+var transaction_btn = document.getElementById("transaction-history-btn");
 
-var transfer_receiverid = document.getElementById("receiverid")
-var transfer_senderid = document.getElementById("senderid")
-var transfer_balance = document.getElementById("balance");
+var transfer_receiverid = document.getElementById("receiverid-input")
+var transfer_senderid = document.getElementById("senderid-input")
+var transfer_balance = document.getElementById("balance-input");
 
-var deposit_userid = document.getElementById("deposit_userid");
-var deposit_balance = document.getElementById("deposit_balance");
+var deposit_userid = document.getElementById("deposit-userid-input");
+var deposit_balance = document.getElementById("deposit-balance-input");
 
-var withdrawal_userid = document.getElementById("withdrawal_userid");
-var withdrawal_balance = document.getElementById(" withdrawal_balance");
+var withdrawal_userid = document.getElementById("withdrawal-userid-input");
+var withdrawal_balance = document.getElementById(" withdrawal-balance-input");
 
 
 transfer_btn.addEventListener('click', async () => {
