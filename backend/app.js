@@ -1,6 +1,6 @@
 import { account, deposit, money_transfer, withdraw } from "./model.js"
 import { autoIncrement, getBalance } from "./common.js"
-import { BadRequest, Create, OK, ServerError } from "./constant.js"
+import { BadRequest, Create, OK, ServerError, minTransaction } from "./constant.js"
 
 import express from "express"
 import bodyParser from "body-parser"
@@ -25,48 +25,94 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
-//finish
-app.get('/os-project/get-account', (req, res) => {
-  account.find({}, (err, accounts) => {
-    if (err) res.status(ServerError)
-    else res.json(accounts)
-  })
+app.get('/os-project/get-account', async (req, res) => {
+  try {
+    const accounts = await account.find({});
+    res.json(accounts);
+    return;
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(ServerError).send(err);
+  }
 });
 
-//finish
-app.post('/os-project/create-account', (req, res) => {
+app.post('/os-project/create-account', async (req, res) => {
   const { username, balance } = req.body;
-  if(balance != 'Number') res.sendStatus(BadRequest);
+
+  if (typeof (balance) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
   var id;
-  autoIncrement().then((count) => {
-    id = count;
 
-    var newAccount = new account({
-      id,
-      username,
-      balance,
-    });
-
-    newAccount.save()
-      .then(() => {
-        res.sendStatus(Create);
-      })
-      .catch((err) => {
-        res.sendStatus(ServerError);
-      });
+  const session = await mongoose.startSession();
+  session.startTransaction({
+    "readConcern": { "level": "snapshot" },
+    "writeConcern": { "w": "majority" }
   })
+  try {
+    autoIncrement().then(async (count) => {
+      id = count;
+
+      var newAccount = new account({
+        id,
+        username,
+        balance,
+      });
+
+      await newAccount.save();
+      await session.commitTransaction();
+      session.endSession();
+      res.sendStatus(Create);
+      return;
+    })
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error('Error:', err);
+    res.status(ServerError).send(err);
+    return;
+  }
 })
-//finish
-app.post('/os-project/transfer', (req, res) => {
+
+app.post('/os-project/transfer', async (req, res) => {
   const { receiverid, senderid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if (typeof (amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
+  if (amount < minTransaction || receiverid == senderid) {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
   getBalance(senderid).then((senderAccountBlance, err) => {
-    if (err) res.sendStatus(ServerError)
-    else if (senderAccountBlance == null) res.sendStatus(BadRequest)
-    else if (senderAccountBlance < amount) res.sendStatus(BadRequest)
+    if (err) {
+      res.sendStatus(ServerError).send(err);
+      return;
+    }
+    else if (senderAccountBlance == null || senderAccountBlance < amount) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
-      getBalance(receiverid).then((receiverAccountBalance, err) => {
+      getBalance(receiverid).then(async (receiverAccountBalance, err) => {
+        if (err) {
+          res.sendStatus(ServerError).send(err);
+          return;
+        }
+        else if (receiverAccountBalance == null || receiverAccountBlance < amount) {
+          res.sendStatus(BadRequest);
+          return;
+        }
+
+        const session = await mongoose.startSession();
+        session.startTransaction({
+          "readConcern": { "level": "snapshot" },
+          "writeConcern": { "w": "majority" }
+        });
+
         var transfer = new money_transfer({
           receiverid,
           senderid,
@@ -90,163 +136,220 @@ app.post('/os-project/transfer', (req, res) => {
         }
         const senderQuery = { id: senderid };
         const receiverQuery = { id: receiverid };
+        try {
+          await account.updateOne(senderQuery, updateSender);
+          await account.updateOne(receiverQuery, updateReceiver);
 
-        account.updateOne(senderQuery, updateSender, (err, result) => {
-          if (err) {
-            throw (err)
-          } else {
-            console.log('Document updated successfully.');
-          }
-        })
+          await transfer.save();
 
-        account.updateOne(receiverQuery, updateReceiver, (err, result) => {
-          if (err) {
-            throw (err)
-          } else {
-            console.log('Document updated successfully.');
-          }
-        })
+          await session.commitTransaction();
+          session.endSession();
+          res.sendStatus(Create);
+          return;
+        } catch (err) {
+          await session.abortTransaction();
+          session.endSession();
 
-        transfer.save()
-          .then(() => {
-            res.send(Create);
-          })
-          .catch((err) => {
-            res.status(ServerError);
-          })
+          console.error('Error:', err);
+          res.status(ServerError).send(err);
+          return;
+        }
       })
     }
   })
 })
-//finish
-app.put('/os-project/deposit', (req, res) => {
+
+app.put('/os-project/deposit', async (req, res) => {
   const { userid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if (typeof (amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
+  if (amount < minTransaction) {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
-  getBalance(userid).then((accountBalance, err) => {
-    if (err) res.sendStatus(ServerError);
-    else if (accountBalance == null) res.sendStatus(BadRequest);
+  getBalance(userid).then(async (accountBalance, err) => {
+    if (err) {
+      res.sendStatus(ServerError).send(err);
+      return;
+    }
+    else if (accountBalance == null) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
+      const session = await mongoose.startSession();
+      session.startTransaction({
+        "readConcern": { "level": "snapshot" },
+        "writeConcern": { "w": "majority" }
+      });
+      try {
+        var depositInfo = new deposit({
+          userid,
+          amount,
+          balance: accountBalance + amount
+        })
 
-      var depositInfo = new deposit({
-        userid,
-        amount,
-        balance: accountBalance + amount
-      })
-
-      const update = {
-        $set: {
-          balance: accountBalance + amount,
-          updateAt: Date.now()
+        const update = {
+          $set: {
+            balance: accountBalance + amount,
+            updateAt: Date.now()
+          }
         }
+
+        const myQuery = { id: userid };
+
+        await account.updateOne(myQuery, update);
+
+        await depositInfo.save();
+
+        await session.commitTransaction();
+        session.endSession();
+        res.sendStatus(Create);
+        return;
+      } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+
+        console.error('Error:', err);
+        res.status(ServerError).send(err);
+        return;
       }
-
-      const myQuery = { id: userid };
-
-      account.updateOne(myQuery, update, (err, result) => {
-        if (err) {
-          throw (err)
-        } else {
-          console.log('Document updated successfully.');
-        }
-      })
-
-      depositInfo.save();
-      res.send(Create);
     }
   })
 })
-//finish
+
 app.put('/os-project/withdraw', (req, res) => {
   const { userid, amount } = req.body;
-  if(amount != 'Number') res.sendStatus(BadRequest);
+  if (typeof (amount) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
+  if (amount < minTransaction) {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
-  getBalance(userid).then((accountBalance, err) => {
-    if (err) res.sendStatus(ServerError);
-    else if (accountBalance == null) res.sendStatus(BadRequest);
-    else if (accountBalance < amount) res.sendStatus(BadRequest);
+  getBalance(userid).then(async (accountBalance, err) => {
+    if (err) {
+      res.sendStatus(ServerError).send(err);
+      return;
+    }
+    else if (accountBalance == null) {
+      res.sendStatus(BadRequest);
+      return;
+    }
+    else if (accountBalance < amount) {
+      res.sendStatus(BadRequest);
+      return;
+    }
     else {
-      var withdrawInfo = new withdraw({
-        userid,
-        amount,
-        balance: accountBalance - amount
-      })
+      const session = await mongoose.startSession();
+      session.startTransaction({
+        "readConcern": { "level": "snapshot" },
+        "writeConcern": { "w": "majority" }
+      });
 
-      const update = {
-        $set: {
-          balance: accountBalance - amount,
-          updateAt: Date.now()
+      try {
+        var withdrawInfo = new withdraw({
+          userid,
+          amount,
+          balance: accountBalance - amount
+        })
+
+        const update = {
+          $set: {
+            balance: accountBalance - amount,
+            updateAt: Date.now()
+          }
         }
+
+        const myQuery = { id: userid };
+
+        await account.updateOne(myQuery, update);
+
+        await withdrawInfo.save();
+
+        await session.commitTransaction();
+        session.endSession();
+        res.sendStatus(Create);
+        return;
+      } catch (err) {
+        await session.abortTransaction();
+        session.endSession();
+
+        console.error('Error:', err);
+        res.status(ServerError).send(err);
+        return;
       }
-
-      const myQuery = { id: userid };
-
-      account.updateOne(myQuery, update, (err, result) => {
-        if (err) {
-          throw (err)
-        } else {
-          console.log('Document updated successfully.');
-        }
-      })
-
-      withdrawInfo.save();
-      res.send(Create);
     }
   })
 })
 
 app.get('/os-project/transaction', async (req, res) => {
   const { userid } = req.body;
+  if (typeof (userid) != 'number') {
+    res.sendStatus(BadRequest);
+    return;
+  }
 
-  const documents = db.collection('moneyTransfer').find({})
-  let transactions = [];
+  try {
+    const documents = db.collection('moneyTransfer').find({})
+    let transactions = [];
 
-  await documents.forEach(async (doc) => {
-    //if type is deposit and withdraw
-    if(doc.type != "transfer"){
-      if(doc.userid == userid){
-        //create transaction to add to array
-        const newTransaction = {
-          userid,
-          deposit: (doc.type == "deposit") ? doc.amount : null,
-          withdraw: (doc.type == "withdraw") ? doc.amount : null,
-          balance: doc.balance,
-          timestamp: doc.createAt
+    await documents.forEach(async (doc) => {
+      //if type is deposit and withdraw
+      if (doc.type != "transfer") {
+        if (doc.userid == userid) {
+          //create transaction to add to array
+          const newTransaction = {
+            userid,
+            deposit: (doc.type == "deposit") ? doc.amount : null,
+            withdraw: (doc.type == "withdraw") ? doc.amount : null,
+            balance: doc.balance,
+            timestamp: doc.createAt
+          }
+
+          transactions.push(Object.assign({}, newTransaction));
         }
-        console.log("this is new")
-
-        transactions.push(Object.assign({}, newTransaction));
       }
-    }
-    //if type is transfer
-    else {
-      //if this user is receiver
-      if(doc.receiverid == userid){
-        const newTransaction = {
-          userid,
-          deposit: doc.amount,
-          withdraw: null,
-          balance: doc.receiverbalance,
-          timestamp: doc.createAt
+      //if type is transfer
+      else {
+        //if this user is receiver
+        if (doc.receiverid == userid) {
+          const newTransaction = {
+            userid,
+            deposit: doc.amount,
+            withdraw: null,
+            balance: doc.receiverbalance,
+            timestamp: doc.createAt
+          }
+
+          transactions.push(Object.assign({}, newTransaction));
         }
+        //if this user is sender
+        else if (doc.senderid == userid) {
+          const newTransaction = {
+            userid,
+            deposit: null,
+            withdraw: doc.amount,
+            balance: doc.senderbalance,
+            timestamp: doc.createAt
+          }
 
-        transactions.push(Object.assign({}, newTransaction));
-      }
-      //if this user is sender
-      else if(doc.senderid == userid){
-        const newTransaction = {
-          userid,
-          deposit: null,
-          withdraw: doc.amount,
-          balance: doc.senderbalance,
-          timestamp: doc.createAt
+          transactions.push(Object.assign({}, newTransaction));
         }
-
-        transactions.push(Object.assign({}, newTransaction));
       }
-    }
-  })
-  res.json(transactions)
+    })
+    res.json(transactions);
+    return;
+  } catch (err) {
+    res.status(ServerError).send(err);
+    return;
+  }
+
 })
 
 app.listen(port, () => {
