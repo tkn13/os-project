@@ -5,11 +5,11 @@ import { BadRequest, Create } from "./constant.js"
 import express from "express"
 import bodyParser from "body-parser"
 import mongoose from "mongoose"
-// import cors from "cors"
+import cors from "cors"
 const port = 3000;
 const app = express();
 
-// app.use(cors())
+app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
