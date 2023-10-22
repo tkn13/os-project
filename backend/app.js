@@ -29,8 +29,7 @@ db.once('open', () => {
 app.get('/os-project/get-account', (req, res) => {
   account.find({}, (err, accounts) => {
     if (err) {
-      res.send(err);
-      res.status(ServerError);
+      res.sendStatus(ServerError).send(err);
       return;
     }
     else {
@@ -48,6 +47,7 @@ app.post('/os-project/create-account', (req, res) => {
     return;
   }
   var id;
+
   autoIncrement().then((count) => {
     id = count;
 
@@ -58,7 +58,7 @@ app.post('/os-project/create-account', (req, res) => {
     });
 
     newAccount.save();
-    res.sendStatus(ServerError);
+    res.sendStatus(Create);
     return;
   })
 })
@@ -72,8 +72,7 @@ app.post('/os-project/transfer', (req, res) => {
 
   getBalance(senderid).then((senderAccountBlance, err) => {
     if (err) {
-      res.send(err);
-      res.sendStatus(ServerError);
+      res.sendStatus(ServerError).send(err);
       return;
     }
     else if (senderAccountBlance == null) {
@@ -112,8 +111,7 @@ app.post('/os-project/transfer', (req, res) => {
 
         account.updateOne(senderQuery, updateSender, (err, result) => {
           if (err) {
-            res.send(err);
-            res.sendStatus(BadRequest)
+            res.sendStatus(BadRequest).send(err);
             return;
           } else {
             console.log('Document updated successfully.');
@@ -122,8 +120,7 @@ app.post('/os-project/transfer', (req, res) => {
 
         account.updateOne(receiverQuery, updateReceiver, (err, result) => {
           if (err) {
-            res.send(err);
-            res.sendStatus(BadRequest)
+            res.sendStatus(BadRequest).send(err);
             return;
           } else {
             console.log('Document updated successfully.');
@@ -147,8 +144,7 @@ app.put('/os-project/deposit', (req, res) => {
 
   getBalance(userid).then((accountBalance, err) => {
     if (err) {
-      res.send(err);
-      res.sendStatus(ServerError);
+      res.sendStatus(ServerError).send(err);
       return;
     }
     else if (accountBalance == null) {
@@ -173,8 +169,7 @@ app.put('/os-project/deposit', (req, res) => {
 
       account.updateOne(myQuery, update, (err, result) => {
         if (err) {
-          res.send(err);
-          res.sendStatus(BadRequest)
+          res.sendStatus(BadRequest).send(err);
           return;
         } else {
           console.log('Document updated successfully.');
@@ -182,7 +177,7 @@ app.put('/os-project/deposit', (req, res) => {
       })
 
       depositInfo.save();
-      res.send(Create);
+      res.sendStatus(Create);
       return;
     }
   })
@@ -197,8 +192,7 @@ app.put('/os-project/withdraw', (req, res) => {
 
   getBalance(userid).then((accountBalance, err) => {
     if (err) {
-      res.send(err);
-      res.sendStatus(ServerError);
+      res.sendStatus(ServerError).send(err);
       return;
     }
     else if (accountBalance == null) {
@@ -227,8 +221,7 @@ app.put('/os-project/withdraw', (req, res) => {
 
       account.updateOne(myQuery, update, (err, result) => {
         if (err) {
-          res.send(err);
-          res.sendStatus(ServerError);
+          res.sendStatus(ServerError).send(err);
           return;
         } else {
           console.log('Document updated successfully.');
@@ -236,7 +229,7 @@ app.put('/os-project/withdraw', (req, res) => {
       })
 
       withdrawInfo.save();
-      res.send(Create);
+      res.sendStatus(Create);
       return;
     }
   })
