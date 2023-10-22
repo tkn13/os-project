@@ -1,6 +1,7 @@
-var transfer_but = document.getElementById("money-transfer");
-var deposit_but = document.getElementById("deposit");
-var withdrawal_but = document.getElementById("withdrawal");
+var transfer_btn = document.getElementById("money-transfer");
+var deposit_btn = document.getElementById("deposit");
+var withdrawal_btn = document.getElementById("withdrawal");
+var transaction_btn = document.getElementById("transaction-history");
 
 var transfer_receiverid = document.getElementById("receiverid")
 var transfer_senderid = document.getElementById("senderid")
@@ -12,7 +13,8 @@ var deposit_balance = document.getElementById("deposit_balance");
 var withdrawal_userid = document.getElementById("withdrawal_userid");
 var withdrawal_balance = document.getElementById(" withdrawal_balance");
 
-transfer_but.addEventListener('click', async () => {
+
+transfer_btn.addEventListener('click', async () => {
     try{
         const account = {
             receiverid : transfer_receiverid.value,
@@ -36,7 +38,7 @@ transfer_but.addEventListener('click', async () => {
     }
 });
 
-deposit_but.addEventListener('click', async () => {
+deposit_btn.addEventListener('click', async () => {
     try{
         const account = {
             userid : deposit_userid.value,
@@ -59,7 +61,7 @@ deposit_but.addEventListener('click', async () => {
     }
 });
 
-withdrawal_but.addEventListener('click', async () => {
+withdrawal_btn.addEventListener('click', async () => {
     try{
         const account = {
             user : withdrawal_userid.value,
@@ -80,4 +82,8 @@ withdrawal_but.addEventListener('click', async () => {
     } catch (error) {
         console.error('An error occurred:', error);
     }
+});
+
+transaction_btn.addEventListener('click', async () => {
+    window.location.href = '../transaction.html';
 });
