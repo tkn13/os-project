@@ -67,6 +67,10 @@ app.post('/os-project/create-account', async (req, res) => {
       return;
     })
   } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error('Error:', err);
     res.status(ServerError).send(err);
     return;
   }
@@ -78,7 +82,7 @@ app.post('/os-project/transfer', async (req, res) => {
     res.sendStatus(BadRequest);
     return;
   }
-  if(amount < minTransaction || receiverid == senderid) {
+  if (amount < minTransaction || receiverid == senderid) {
     res.sendStatus(BadRequest);
     return;
   }
@@ -161,7 +165,7 @@ app.put('/os-project/deposit', async (req, res) => {
     res.sendStatus(BadRequest);
     return;
   }
-  if(amount < minTransaction) {
+  if (amount < minTransaction) {
     res.sendStatus(BadRequest);
     return;
   }
@@ -223,7 +227,7 @@ app.put('/os-project/withdraw', (req, res) => {
     res.sendStatus(BadRequest);
     return;
   }
-  if(amount < minTransaction) {
+  if (amount < minTransaction) {
     res.sendStatus(BadRequest);
     return;
   }
