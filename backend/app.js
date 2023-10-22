@@ -5,12 +5,11 @@ import { BadRequest, Create } from "./constant.js"
 import express from "express"
 import bodyParser from "body-parser"
 import mongoose from "mongoose"
+// import cors from "cors"
 const port = 3000;
 const app = express();
 
-// const mongoose = require("mongoose");
-// const express = require("express");
-// const bodyParser = require("body-parser");
+// app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,13 +24,7 @@ db.on('error', (error) => {
 db.once('open', () => {
   console.log('Connected to MongoDB');
 });
-//test
-app.get('/all-account', (req, res) => {
-  account.find({}, (err, accounts) => {
-    if (err) res.status(ServerError)
-    else res.json(accounts)
-  })
-});
+
 //test
 app.get('/all-money-transfer', (req, res) => {
   money_transfer.find({}, (err, accounts) => {
@@ -39,8 +32,17 @@ app.get('/all-money-transfer', (req, res) => {
     else res.json(accounts)
   })
 });
+
 //finish
-app.post('/create-account', (req, res) => {
+app.get('/os-project/get-account', (req, res) => {
+  account.find({}, (err, accounts) => {
+    if (err) res.status(ServerError)
+    else res.json(accounts)
+  })
+});
+
+//finish
+app.post('/os-project/create-account', (req, res) => {
   const { username, balance } = req.body;
   var id;
   autoIncrement().then((count) => {
@@ -62,7 +64,7 @@ app.post('/create-account', (req, res) => {
   })
 })
 //finish
-app.post('/transfer', (req, res) => {
+app.post('/os-project/transfer', (req, res) => {
   const { receiverid, senderid, balance } = req.body;
 
   var transfer = new money_transfer({
@@ -121,7 +123,7 @@ app.post('/transfer', (req, res) => {
   })
 })
 //finish
-app.put('/deposit', (req, res) => {
+app.put('/os-project/deposit', (req, res) => {
   const { userid, balance } = req.body;
 
   var depositInfo = new deposit({
@@ -156,7 +158,7 @@ app.put('/deposit', (req, res) => {
   })
 })
 //finish
-app.put('/withdraw', (req, res) => {
+app.put('/os-project/withdraw', (req, res) => {
   const { userid, balance } = req.body;
 
   var withdrawInfo = new withdraw({
@@ -193,7 +195,7 @@ app.put('/withdraw', (req, res) => {
 })
 
 //test
-app.post('/create-account-manual', (req, res) => {
+app.post('/os-project/create-account-manual', (req, res) => {
   const { id, username, balance } = req.body;
 
   var create_account = new account({
@@ -212,7 +214,7 @@ app.post('/create-account-manual', (req, res) => {
 })
 
 //test
-app.get('/view-collection', (req, res) => {
+app.get('/os-project/view-collection', (req, res) => {
   mongoose.connection.db.listCollections().toArray((err, collections) => {
     if (err) {
       console.error('เกิดข้อผิดพลาดในการดึงรายชื่อคอลเลกชัน:', err);
@@ -225,7 +227,7 @@ app.get('/view-collection', (req, res) => {
   res.send(OK);
 })
 //test
-app.delete('/delete-all-account', (req, res) => {
+app.delete('/os-project/delete-all-account', (req, res) => {
   account.deleteMany({}, (err) => {
     if (err) {
       console.error('Error deleting data:', err);
@@ -236,7 +238,7 @@ app.delete('/delete-all-account', (req, res) => {
   res.send(OK);
 })
 //test
-app.delete('/delete-all-moneytransfer', (req, res) => {
+app.delete('/os-project/delete-all-moneytransfer', (req, res) => {
   money_transfer.deleteMany({}, (err) => {
     if (err) {
       console.error('Error deleting data:', err);
