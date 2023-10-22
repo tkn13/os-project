@@ -122,6 +122,11 @@ header{
     font-weight: 600;
     padding: 0 35px 0 5px;
 }
+.input-box input::placeholder{
+    color: #797979;
+    font-size: 0.75em;
+
+}
 .back-home{
     margin: 5px;
     text-align: center;
