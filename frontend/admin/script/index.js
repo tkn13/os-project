@@ -1,9 +1,9 @@
-var create_account_but = document.getElementById("create-account");
-var get_account_but = document.getElementById("get-account");
-var create_account_username = document.getElementById("create_account_username");
-var create_account_balance = document.getElementById("create_account_balance");
+var create_account_btn = document.getElementById("create-account-btn");
+var get_account_btn = document.getElementById("get-account-btn");
+var create_account_username = document.getElementById("create-account-username-input");
+var create_account_balance = document.getElementById("create-account-balance-input");
 
-create_account_but.addEventListener('click', async () => {
+create_account_btn.addEventListener('click', async () => {
 
     const data = {
         username: create_account_username.value,
@@ -17,7 +17,7 @@ create_account_but.addEventListener('click', async () => {
             body: jsonDataString
         });
 
-        if (res.status != 200) {
+        if (res.status != 201) {
             window.location.href = '../error.html'
             return
         } else {
@@ -28,6 +28,6 @@ create_account_but.addEventListener('click', async () => {
     }
 });
 
-get_account_but.addEventListener('click', async () => {
+get_account_btn.addEventListener('click', async () => {
     window.location.href = 'get-account.html'
 });
