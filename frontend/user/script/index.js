@@ -1,7 +1,6 @@
 var transfer_btn = document.getElementById("money-transfer-btn");
 var deposit_btn = document.getElementById("deposit-btn");
 var withdrawal_btn = document.getElementById("withdrawal-btn");
-var transaction_btn = document.getElementById("transaction-history-btn");
 
 var transfer_receiverid = document.getElementById("receiverid-input")
 var transfer_senderid = document.getElementById("senderid-input")
@@ -82,8 +81,4 @@ withdrawal_btn.addEventListener('click', async () => {
     } catch (error) {
         console.error('An error occurred:', error);
     }
-});
-
-transaction_btn.addEventListener('click', async () => {
-    window.location.href = '../transaction.html';
 });
