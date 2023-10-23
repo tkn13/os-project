@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transfer</title>
+    <title>Withdraw</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -23,27 +23,19 @@
         </ul>
     </nav>
 
-    <div class="wrapper-tranfer">
+    <div class="wrapper">
         <aside>
             <div class="head">
-                <h1>Transfer</h1>
+                <h1>Transaction</h1>
             </div>
             <div class="box">
-                <input type = "text" name = "" id = "senderid-input" placeholder = "Enter your Account Number">
+                <input type = "text" name = "" id = "transaction-userid-input" placeholder = "Enter your Account number">
                 <p>Account Number</p>
             </div>
-            <div class="box">
-                <input type = "text" name = "" id = "receiverid-input" placeholder = "Enter Receiver Account Number">
-                <p>Account Number</p>
-            </div>
-            <div class="box">
-                <input type = "text" name = "" id = "balance-input" placeholder = "Enter your Amount">
-                <p>Amount</p>
-            </div>
-            <button type = "button" id = "money-transfer-btn"><span></span>Submit</button>
+            <button type = "button" id = "transaction-history-btn"><span></span>Submit</button>
         </aside>
     </div>
-
+    <script src="script/getTransaction.js"></script>
 </body>
 
 </html>
