@@ -1,31 +1,38 @@
-async () => {
+window.addEventListener('load', async () => {
+    function getQueryParam(parameterName) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(parameterName);
+    }
+
+    const userId = getQueryParam("userid");
     try {
         const history = {
-            userid: document.getElementById("transaction-userid-input").value,
+            userid: parseInt(userId)
         }
         const jsonDataString = JSON.stringify(history);
 
         const res = await fetch('http://localhost:3000/os-project/transaction', {
-            method: "GET",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+              },
             body: jsonDataString
         });
 
-        if (res.status != 200) {
-            window.location.href = '../error.html';
-            return;
-        }
+        const data = await res.json()
+
         const table = document.getElementById('transaction-table');
         data.forEach(entry => {
             const row = table.insertRow();
             const useridCell = row.insertCell(0);
-            const depositCell = row.insertCell(1);
-            const withdrawalCell = row.insertCell(2);
-            const amountCell = row.insertCell(3);
-            const timestampCell = row.insertCell(4);
+            const timestampCell = row.insertCell(1);
+            const depositCell = row.insertCell(2);
+            const withdrawalCell = row.insertCell(3);
+            const amountCell = row.insertCell(4);
             useridCell.textContent = entry.userid;
             depositCell.textContent = entry.deposit;
-            withdrawalCell.textContent = entry.withdrawal;
-            amountCell.textContent = entry.amount;
+            withdrawalCell.textContent = entry.withdraw;
+            amountCell.textContent = entry.balance;
             const date = new Date(entry.timestamp);
             const option = {
                 year: '2-digit',
@@ -42,3 +49,4 @@ async () => {
         console.error('An error occurred:', error);
     }
 }
+)

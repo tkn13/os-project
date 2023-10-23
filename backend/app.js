@@ -26,8 +26,14 @@ db.once('open', () => {
 });
 
 app.get('/os-project/get-account', async (req, res) => {
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   try {
     const accounts = await account.find({});
+    console.log("--------------------------------")
+  console.log(accounts)
+  console.log("--------------------------------")
     res.json(accounts);
     return;
   } catch (err) {
@@ -38,7 +44,9 @@ app.get('/os-project/get-account', async (req, res) => {
 
 app.post('/os-project/create-account', async (req, res) => {
   const { username, balance } = req.body;
-
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   if (typeof (balance) != 'number') {
     res.sendStatus(BadRequest);
     return;
@@ -78,6 +86,9 @@ app.post('/os-project/create-account', async (req, res) => {
 
 app.post('/os-project/transfer', async (req, res) => {
   const { receiverid, senderid, amount } = req.body;
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   if (typeof (amount) != 'number') {
     res.sendStatus(BadRequest);
     return;
@@ -102,7 +113,7 @@ app.post('/os-project/transfer', async (req, res) => {
           res.sendStatus(ServerError).send(err);
           return;
         }
-        else if (receiverAccountBalance == null || receiverAccountBlance < amount) {
+        else if (receiverAccountBalance == null || receiverAccountBalance < amount) {
           res.sendStatus(BadRequest);
           return;
         }
@@ -161,6 +172,9 @@ app.post('/os-project/transfer', async (req, res) => {
 
 app.put('/os-project/deposit', async (req, res) => {
   const { userid, amount } = req.body;
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   if (typeof (amount) != 'number') {
     res.sendStatus(BadRequest);
     return;
@@ -223,6 +237,9 @@ app.put('/os-project/deposit', async (req, res) => {
 
 app.put('/os-project/withdraw', (req, res) => {
   const { userid, amount } = req.body;
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   if (typeof (amount) != 'number') {
     res.sendStatus(BadRequest);
     return;
@@ -288,8 +305,11 @@ app.put('/os-project/withdraw', (req, res) => {
   })
 })
 
-app.get('/os-project/transaction', async (req, res) => {
+app.post('/os-project/transaction', async (req, res) => {
   const { userid } = req.body;
+  console.log("--------------------------------")
+  console.log(req.body)
+  console.log("--------------------------------")
   if (typeof (userid) != 'number') {
     res.sendStatus(BadRequest);
     return;
