@@ -1,23 +1,20 @@
-ul {
+/* ul {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
     background-color: #333;
+    display: flex;
 
   }
-  
-  li {
-    float: left;
-  }
-  
+
   li a {
     display: block;
     color: white;
     text-align: center;
     padding: 18px 20px;
     text-decoration: none;
-  }
+  } */
 
 * {
     margin: 0;
@@ -27,10 +24,10 @@ ul {
 }
 
 body {
-    height: 50vh;
+    /* height: 50vh; */
     display: block;
     position: relative;
-    background-image: url("ghibi1.jpg");
+    background-image: url("../../src/pic/ghibi1.jpg");
     background-size: cover;
 }
 
@@ -100,4 +97,65 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.wrapper-tranfer{
+    position: fixed;
+    left: 30%;
+    top: 16%;
+    width: 650px;
+    height: 550px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+nav {
+    background-color: #333;
+    color: #fff;
+    font-size: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+
+.toto-logo {
+    position: absolute;
+    left: 20px;
+    top: -10px;
+    width: 50px;
+    height: 50px;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+nav li{
+    margin: 15px 5px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px 15px;
+}
+
+nav a:hover {
+    background-color: #494444;
 }

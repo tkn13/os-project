@@ -1,11 +1,11 @@
-.banner{
-    width: 100%;
-    height: 100vh;
+body{
     /*background-image: linear-gradient(
         rgb(0, 0, 0.49),rgba(0, 0, 0, 0.49)),url(pic/ghibi1.jpg);*/
-        background: url(pic/ghibi1.jpg);
+        height: 100dvh;
+        background: url(../../src/pic/ghibi1.jpg);
         background-size: cover;
         background-position: center;
+        background-repeat: no-repeat;
 }
 .banner p{
     color: #000

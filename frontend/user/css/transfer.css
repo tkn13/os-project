@@ -5,11 +5,11 @@ ul {
     overflow: hidden;
     background-color: #333;
   }
-  
+
   li {
     float: left;
   }
-  
+
   li a {
     display: block;
     color: white;
@@ -87,7 +87,7 @@ button {
     cursor: pointer;
 }
 
-.wrapper{
+.wrapper-tranfer{
     position: fixed;
     left: 30%;
     top: 16%;
