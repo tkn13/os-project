@@ -1,0 +1,102 @@
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+li {
+    float: left;
+}
+  
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 18px 20px;
+    text-decoration: none;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
+
+div{
+    display: block;
+    position: fixed;
+}
+
+body {
+    height: 50vh;
+    display: block;
+    position: relative;
+    background-image: url("ghibi1.jpg");
+    background-size: cover;
+}
+
+.head {
+    left: 36%;
+    top: 10%;
+    font-size: 160%;
+}
+
+.box {
+    left: 3%;
+    top: 50%;
+    width: 500px;
+    height: 8vh;
+    position: relative;
+    margin: 50px 25px;
+}
+
+.box input {
+    width: 100%;
+    height: 100%;
+    border-radius: 7px;
+    border: solid 1px #252525;
+    outline: none;
+    padding: 15px;
+    font-size: 16px;
+}
+
+.box p {
+    position: absolute;
+    top: -24px;
+    left: 1%;
+    padding: 0 5px;
+}
+
+button {
+    position: relative;
+    top: 50%;
+    left: 36%;
+    width: 150px;
+    height: 50px;
+    text-align: center;
+    border-radius: 15px;
+    font-weight: 50px;
+    border: 2px solid rgb(17, 17, 27);
+    background-color: rgb(230, 234, 240);
+    color: black;
+    cursor: pointer;
+}
+
+.wrapper{
+    position: fixed;
+    left: 30%;
+    top: 20%;
+    width: 650px;
+    height: 500px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
