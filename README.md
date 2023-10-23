@@ -24,6 +24,8 @@ This project was developed as part of the Operating Systems (OS) class and was a
 **Database**
 * MongoDB
 
+
+![SW-Architecture](frontend/src/pic/OS-Architecture.png)
 ***
 
 ## Building the Docker Image
