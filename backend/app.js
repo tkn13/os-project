@@ -113,7 +113,7 @@ app.post('/os-project/transfer', async (req, res) => {
           res.sendStatus(ServerError).send(err);
           return;
         }
-        else if (receiverAccountBalance == null || receiverAccountBalance < amount) {
+        else if (receiverAccountBalance == null) {
           res.sendStatus(BadRequest);
           return;
         }
