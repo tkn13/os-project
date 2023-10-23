@@ -1,10 +1,11 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins',sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
-body{
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -14,9 +15,9 @@ body{
     background-image: url(../../src/pic/ghibi1.jpg);
     background-size: cover;
     background-position: center
-    
 }
-header{
+
+header {
     position: fixed;
     top: 0;
     left: 0;
@@ -28,7 +29,8 @@ header{
     align-items: center;
     z-index: 99;
 }
-.navbar{
+
+.navbar {
     width: 85%;
     margin: auto;
     padding: 35px 0;
@@ -37,18 +39,21 @@ header{
     justify-content: space-between;
     color: white;
 }
-.logo{
+
+.logo {
     font-size: 2.5em;
     color: #fff;
     user-select: none;
 }
-.toto-logo{
+
+.toto-logo {
     float: left;
     width: 45px;
     height: auto;
     margin-top: -20px;
 }
-.navigation a{
+
+.navigation a {
     position: relative;
     font-size: 1.1em;
     color: #fff;
@@ -57,7 +62,8 @@ header{
     text-transform: uppercase;
     margin: 0 20px;
 }
-.navigation a::after{
+
+.navigation a::after {
     content: '';
     position: absolute;
     left: 0;
@@ -70,40 +76,47 @@ header{
     transform: scaleX(0);*/
     transition: 0.5s;
 }
-.navigation a:hover::after{
+
+.navigation a:hover::after {
     /*transform-origin: left;
     transform: scaleX(1);*/
     width: 100%;
 }
-.content-table{
+
+.content-table {
     border-collapse: collapse;
     margin: 5% 10px;
     font-size: 0.9em;
     min-width: 1000px;
     border-radius: 15px 15px 15px 15px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(0, 0 , 0, 0.5);
-    
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+
 }
-.content-table thead tr{
+
+.content-table thead tr {
     background-color: #009879;
     color: #fff;
     text-align: left;
     font-size: bold;
 }
+
 .content-table th,
-.content-table td{
+.content-table td {
     padding: 15px 10px;
 }
-.content-table tbody tr{
+
+.content-table tbody tr {
     background-color: white;
     border-bottom: 1px solid #dddddd;
 }
-.content-table tbody tr:nth-of-type(even){
+
+.content-table tbody tr:nth-of-type(even) {
     background-color: #f3f3f3;
     font-weight: bold;
     color: #009879;
 }
-.content-table tbody tr:last-of-type{
+
+.content-table tbody tr:last-of-type {
     border-bottom: 2px solid #009879;
 }

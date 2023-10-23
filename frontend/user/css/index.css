@@ -4,6 +4,7 @@ body {
     background-size: cover;
     background-position: center center;
     background-attachment: fixed;
+    
 }
 
 .banner {
@@ -18,7 +19,8 @@ body {
     position: absolute;
     transform: traslateY(-50%);
     text-align: center;
-    color: black;
+    color: rgb(236, 236, 241);
+    font-weight: bolder;
 }
 
 .content h1 {
@@ -28,8 +30,10 @@ body {
 
 .content p {
     margin: 2%;
-    font-weight: 100;
+    /* font-weight: 100; */
     line-height: 20px;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 footer {
@@ -46,7 +50,7 @@ button{
     font-weight: bold;
     border: 2px solid #d53030;
     background: transparent;
-    color: black;
+    color: rgb(236, 236, 241);
     cursor: pointer;
     position: relative;
     overflow: hidden;

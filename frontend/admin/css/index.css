@@ -1,18 +1,19 @@
-body{
+body {
     /*background-image: linear-gradient(
         rgb(0, 0, 0.49),rgba(0, 0, 0, 0.49)),url(pic/ghibi1.jpg);*/
-        height: 100dvh;
-        background: url(../../src/pic/ghibi1.jpg);
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+    height: 100dvh;
+    background: url(../../src/pic/ghibi1.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
-.banner p{
+
+.banner p {
     color: #000
 }
 
 
-.content{
+.content {
     width: 100%;
     position: absolute;
     /*top: 50%;*/
@@ -20,17 +21,20 @@ body{
     text-align: center;
     color: rgb(255, 255, 255);
 }
-.content h1{
+
+.content h1 {
     font-size: 70px;
     margin-top: 60%;
 }
-.content p{
-    margin: -2% ;
+
+.content p {
+    margin: -2%;
     font-weight: 100;
     line-height: 25px;
-    
+
 }
-button{
+
+button {
     width: 200px;
     padding: 15px 0;
     text-align: center;
@@ -44,7 +48,8 @@ button{
     position: relative;
     overflow: hidden;
 }
-span{
+
+span {
     background: #000000;
     height: 100%;
     width: 0%;
@@ -55,9 +60,11 @@ span{
     z-index: -1;
     transition: 0.5s;
 }
-button:hover span{
+
+button:hover span {
     width: 100%;
 }
-button:hover{
+
+button:hover {
     border: none;
 }
