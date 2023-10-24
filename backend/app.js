@@ -38,11 +38,15 @@ app.get('/os-project/get-account', async (req, res) => {
 
 app.post('/os-project/create-account', async (req, res) => {
   const { username, balance } = req.body;
-
   if (typeof (balance) != 'number') {
     res.sendStatus(BadRequest);
     return;
   }
+  if(balance < 0) {
+    res.sendStatus(BadRequest);
+    return;
+  }
+  
   var id;
 
   const session = await mongoose.startSession();
@@ -102,7 +106,7 @@ app.post('/os-project/transfer', async (req, res) => {
           res.sendStatus(ServerError).send(err);
           return;
         }
-        else if (receiverAccountBalance == null || receiverAccountBlance < amount) {
+        else if (receiverAccountBalance == null) {
           res.sendStatus(BadRequest);
           return;
         }
@@ -279,7 +283,7 @@ app.put('/os-project/withdraw', (req, res) => {
       } catch (err) {
         await session.abortTransaction();
         session.endSession();
-
+        
         console.error('Error:', err);
         res.status(ServerError).send(err);
         return;
