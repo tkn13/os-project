@@ -4,11 +4,11 @@
 
 This project was developed as part of the Operating Systems (OS) class and was a collaborative effort of the following students:
 
-- 65050033
-- 65050281
-- 65050345
-- 65050366
-- 65050534
+- 65050033 Krittidet Prajong
+- 65050281 Nutnicha Kaewrassamee
+- 65050345 Thaksin Chiaokon
+- 65050366 Tanapat Deesamoot
+- 65050534 Pawichaya Krathumthong
 
 ### Tech stacks :
 
